@@ -7,7 +7,7 @@ const connectToDb = require('./db/db');
 const app = express();
 
 const AdminuserRoutes = require("./routes/adminUser.routes");
-
+const OtpRoutes = require("./routes/otp.routes")
 
 connectToDb()
 app.use(cors());
@@ -20,4 +20,5 @@ app.get("/" , (req, res)=>{
 });
 
 app.use("/admin", AdminuserRoutes)
+app.use("/otp",OtpRoutes)
 module.exports = app
