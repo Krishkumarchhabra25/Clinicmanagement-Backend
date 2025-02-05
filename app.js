@@ -8,7 +8,7 @@ const app = express();
 
 const AdminuserRoutes = require("./routes/adminUser.routes");
 const OtpRoutes = require("./routes/otp.routes")
-
+const PatientRoutes = require("./routes/patients.routes")
 connectToDb()
 app.use(cors());
 app.use(express.json());
@@ -21,4 +21,5 @@ app.get("/" , (req, res)=>{
 
 app.use("/admin", AdminuserRoutes)
 app.use("/otp",OtpRoutes)
+app.use("/patient" , PatientRoutes)
 module.exports = app
