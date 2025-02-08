@@ -11,12 +11,10 @@ module.exports.adminAuthUser = async (req, res, next) => {
         }
 
         const isBlackListed = await blacklistTokenModel.findOne({ token });
-
         if (isBlackListed) {  
             return res.status(401).json({ message: "Unauthorized: Token is blacklisted" });
         }
 
-     
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
         const adminUser = await AdminUserModel.findById(decoded._id);
 

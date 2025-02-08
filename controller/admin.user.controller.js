@@ -16,20 +16,39 @@ module.exports.registerAdmin = async(req, res) =>{
     }
 }
 
-module.exports.adminLogin = async (req,res)=>{
+module.exports.adminLogin = async (req, res) => {
     const errors = validationResult(req);
-
-    if(!errors.isEmpty()){
-        return res.status(400).json({success:false , errors:errors.array()});;
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ success: false, errors: errors.array() });
     }
-    const {identifier , password} = req.body;
+  
+    const { identifier, password } = req.body;
     try {
-        const {token , admin} = await adminUserService.adminLogin({identifier ,password});
-        return res.status(200).json({ success: true, message: "Login successful", token, admin });
+      const { token, admin } = await adminUserService.adminLogin({
+        identifier,
+        password,
+      });
+  
+      res.cookie("token", token, {
+        httpOnly: true, // Prevents client-side access
+        secure: process.env.NODE_ENV === "production", // Secure flag for production
+        sameSite: "lax", // Lax mode to allow credentials across origins
+        maxAge: 24 * 60 * 60 * 1000, // 1-day expiration
+      });
+  
+      return res.status(200).json({
+        success: true,
+        message: "Login successful",
+        token,
+        admin,
+      });
     } catch (error) {
-        return res.status(error.statusCode || 500).json({ success: false, message: error.message });
+      return res
+        .status(error.statusCode || 500)
+        .json({ success: false, message: error.message });
     }
-}
+  };
+
 
 module.exports.changePassword = async (req, res) => {
     // Check for validation errors

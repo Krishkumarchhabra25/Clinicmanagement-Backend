@@ -1,25 +1,45 @@
-const dotenv = require('dotenv');
+const dotenv = require("dotenv");
 dotenv.config();
-const express = require('express');
-const cors = require('cors');
-const cookieParser = require('cookie-parser');
-const connectToDb = require('./db/db');
-const app = express();
+const express = require("express");
+const cors = require("cors");
+const cookieParser = require("cookie-parser");
+const connectToDb = require("./db/db");
 
 const AdminuserRoutes = require("./routes/adminUser.routes");
-const OtpRoutes = require("./routes/otp.routes")
-const PatientRoutes = require("./routes/patients.routes")
-connectToDb()
-app.use(cors());
+const OtpRoutes = require("./routes/otp.routes");
+const PatientRoutes = require("./routes/patients.routes");
+
+const app = express();
+
+// Connect to Database
+connectToDb();
+
+// Configure CORS Properly
+app.use(
+  cors({
+    origin: "http://localhost:5173", // Frontend URL
+    credentials: true, // Allow cookies
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"], // Allowed methods
+    allowedHeaders: ["Content-Type", "Authorization"], // Allowed headers
+  })
+);
+
+// Middleware
 app.use(express.json());
-app.use(express.urlencoded({extended:true}));
+app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
-app.get("/" , (req, res)=>{
-    res.send("Hello World")
+// CORS Preflight Handling
+app.options("*", cors());
+
+// Test Route
+app.get("/", (req, res) => {
+  res.send("Hello World");
 });
 
-app.use("/admin", AdminuserRoutes)
-app.use("/otp",OtpRoutes)
-app.use("/patient" , PatientRoutes)
-module.exports = app
+// Routes
+app.use("/admin", AdminuserRoutes);
+app.use("/otp", OtpRoutes);
+app.use("/patient", PatientRoutes);
+
+module.exports = app;
