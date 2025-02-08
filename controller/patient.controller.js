@@ -65,3 +65,46 @@ module.exports.deletePatient = async(req,res)=>{
         return res.status(400).json({ success: false, message: error.message });
     }
 }
+
+module.exports.searchPatients = async (req, res) => {
+    try {
+      const page = parseInt(req.query.page) || 1;
+      const limit = 10;
+  
+      const query = { ...req.query }; 
+  
+      const result = await PatientService.searchPatient(query, page, limit);
+  
+      return res.status(200).json({ success: true, data: result });
+    } catch (error) {
+      return res.status(400).json({ success: false, message: error.message });
+    }
+  };
+  
+  module.exports.sortPatients = async (req, res) => {
+    try {
+      const page = parseInt(req.query.page) || 1;
+      const limit = 10;
+      const sortBy = req.query.sortBy || "name";
+      const sortOrder = req.query.sortOrder || "asc"; 
+  
+      const result = await PatientService.sortPatients(sortBy, sortOrder, page, limit);
+  
+      return res.status(200).json({ success: true, data: result });
+    } catch (error) {
+      return res.status(404).json({ success: false, message: error.message });
+    }
+  };
+  
+  module.exports.exportPatients = async (req, res) => {
+    try {
+      const buffer = await PatientService.exportPatients();
+  
+      
+      res.setHeader("Content-Type", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+      res.setHeader("Content-Disposition", 'attachment; filename="patients.xlsx"');
+      res.send(buffer);
+    } catch (error) {
+      return res.status(500).json({ success: false, message: error.message });
+    }
+  };

@@ -29,4 +29,11 @@ router.get("/all-patient", authMiddleWare.adminAuthUser, PatientController.getal
 router.get("/patient/:id", authMiddleWare.adminAuthUser, validatePatientId, PatientController.getPatientDetailsById);
 router.put("/update-patient/:id", authMiddleWare.adminAuthUser, validatePatientId, validatePatient, PatientController.updatePatient);
 router.delete("/delete-patient/:id", authMiddleWare.adminAuthUser, validatePatientId, PatientController.deletePatient);
+
+router.get("/search-patient", authMiddleWare.adminAuthUser, PatientController.searchPatients);
+
+router.get("/sort-patient", authMiddleWare.adminAuthUser, PatientController.sortPatients);
+
+router.get("/export-patient", authMiddleWare.adminAuthUser, PatientController.exportPatients);
+
 module.exports = router;
