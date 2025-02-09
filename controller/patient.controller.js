@@ -68,18 +68,22 @@ module.exports.deletePatient = async(req,res)=>{
 
 module.exports.searchPatients = async (req, res) => {
     try {
+
       const page = parseInt(req.query.page) || 1;
-      const limit = 10;
-  
-      const query = { ...req.query }; 
-  
-      const result = await PatientService.searchPatient(query, page, limit);
-  
+      const limit = parseInt(req.query.limit) || 10;
+      
+      
+      const { page: _page, limit: _limit, ...criteria } = req.query;
+      
+      const result = await PatientService.searchPatient(criteria, page, limit);
+      
       return res.status(200).json({ success: true, data: result });
     } catch (error) {
+
       return res.status(400).json({ success: false, message: error.message });
     }
   };
+  
   
   module.exports.sortPatients = async (req, res) => {
     try {
