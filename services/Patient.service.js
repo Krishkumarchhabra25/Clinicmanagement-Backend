@@ -101,16 +101,14 @@ module.exports.deletePatient = async(patientId)=>{
         throw new Error("Patient not found")
      }
   } catch (error) {
-    throw new Error(error.message);
+    throw new Error(error.message); 
   }
 }
 
 module.exports.searchPatient = async (criteria, page = 1, limit = 10) => {
   try {
-    // Build search criteria based on allowed search keys
     const searchCriteria = {};
 
-    // --- Validate & handle ID search if provided directly ---
     if (criteria.id) {
       if (mongoose.Types.ObjectId.isValid(criteria.id)) {
         searchCriteria._id = criteria.id;
@@ -119,14 +117,12 @@ module.exports.searchPatient = async (criteria, page = 1, limit = 10) => {
       }
     }
 
-    // --- Handle patientname search ---
     if (criteria.patientname) {
-      // If the value is a valid ObjectId, treat it as an ID search.
+
       if (mongoose.Types.ObjectId.isValid(criteria.patientname)) {
         searchCriteria._id = criteria.patientname;
       } else {
-        // Otherwise, treat the patientname as a normal search term.
-        // Even if the input is numeric, we'll treat it as part of a name search.
+
         const words = criteria.patientname.trim().split(/\s+/);
         searchCriteria.$or = words.map(word => ({
           patientname: { $regex: word, $options: "i" }
@@ -134,20 +130,18 @@ module.exports.searchPatient = async (criteria, page = 1, limit = 10) => {
       }
     }
 
-    // --- Validate & handle phonenumber ---
+
     if (criteria.phonenumber) {
-      // Validate that phonenumber contains only digits and an optional plus sign.
-      // Adjust the regex as needed for your requirements.
+
       if (!/^[\d+]+$/.test(criteria.phonenumber)) {
         throw new Error("Invalid phonenumber: should contain only digits or '+'");
       }
       searchCriteria.phonenumber = criteria.phonenumber;
     }
 
-    // Count total matching documents
+
     const totalPatient = await PatientModel.countDocuments(searchCriteria);
 
-    // Fetch paginated results
     const patients = await PatientModel.find(searchCriteria)
       .skip((page - 1) * limit)
       .limit(limit);
@@ -159,7 +153,6 @@ module.exports.searchPatient = async (criteria, page = 1, limit = 10) => {
       totalPatient,
     };
   } catch (error) {
-    // Re-throw the error so the controller catches it.
     throw new Error(error.message);
   }
 };
