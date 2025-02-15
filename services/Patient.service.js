@@ -3,8 +3,8 @@ const mongoose = require("mongoose")
 const ExcelJS = require("exceljs");
 
 
-module.exports.addPatient = async ({ patientname, phonenumber, gender, village, email, dob, remarks }) => {
-  if (!patientname || !phonenumber || !gender || !village || !email || !dob || !remarks) {
+module.exports.addPatient = async ({ patientname, phonenumber, gender, age ,village, email, dob, remarks }) => {
+  if (!patientname || !phonenumber || !gender || !village || !email || !dob || !remarks ||  !age) {
       throw new Error("All fields are required");
   }
 
@@ -28,6 +28,7 @@ module.exports.addPatient = async ({ patientname, phonenumber, gender, village, 
           email,
           phonenumber,
           village,
+          age,
           gender,
           dob: formattedDob,  
           remarks
@@ -100,6 +101,7 @@ module.exports.deletePatient = async(patientId)=>{
      if(!deletePatient){
         throw new Error("Patient not found")
      }
+     return "Patient deleted successfully";
   } catch (error) {
     throw new Error(error.message); 
   }
@@ -228,6 +230,7 @@ module.exports.exportPatients = async () => {
 
     // Write the file to buffer
     const buffer = await workbook.xlsx.writeBuffer();
+    console.log("Buffer length:", buffer.length)
     return buffer;
   } catch (error) {
     throw new Error(error.message);

@@ -8,7 +8,7 @@ const connectToDb = require("./db/db");
 const AdminuserRoutes = require("./routes/adminUser.routes");
 const OtpRoutes = require("./routes/otp.routes");
 const PatientRoutes = require("./routes/patients.routes");
-
+const AvailabilityRoutes = require("./routes/availability.routes")
 const app = express();
 
 // Connect to Database
@@ -41,5 +41,6 @@ app.get("/", (req, res) => {
 app.use("/admin", AdminuserRoutes);
 app.use("/otp", OtpRoutes);
 app.use("/patient", PatientRoutes);
+app.use("/availability" , AvailabilityRoutes)
 
 module.exports = app;

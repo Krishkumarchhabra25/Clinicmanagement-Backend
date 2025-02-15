@@ -7,8 +7,8 @@ const transporter = nodemailer.createTransport({
         user: process.env.EMAIL_ADDRESS,
         pass:process.env.PASS_PASS
     },
-    logger: true, // Enable logging
-    debug: true   // Show debug messages
+    logger: true, 
+    debug: true   
 });
 
 module.exports.SendOtp = async (email) => {
@@ -28,11 +28,11 @@ module.exports.SendOtp = async (email) => {
         console.log("Email sent:", info);
         setTimeout(async () => {
             await OtpModel.deleteOne({ _id: otpRecord._id });
-        }, 30 * 1000);
+        }, 120 * 1000);
 
         return { success: true, message: "OTP sent successfully" };
     } catch (error) {
-        console.error("Error sending OTP email:", error); // Log error to debug
+        console.error("Error sending OTP email:", error); 
         throw new Error("Failed to send OTP email");
     }
 };

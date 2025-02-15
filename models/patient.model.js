@@ -16,6 +16,10 @@ const PatientSchema = new mongoose.Schema({
         required: true,
         enum: ["male", "female", "other"] 
     },
+    age:{
+        type:String,
+        required:true,
+    },
     village: {
         type: String,
         required: true,

@@ -55,15 +55,22 @@ module.exports.updatePatient = async(req,res)=>{
 
 module.exports.deletePatient = async(req,res)=>{
     const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-        return res.status(400).json({ success: false, errors: errors.array() });
-    }
-    try {
-        const deletePatient = await PatientService.deletePatient(req.params.id);
-        return res.status(200).json({ success: true, message: deletePatient });
-    } catch (error) {
-        return res.status(400).json({ success: false, message: error.message });
-    }
+
+  if (!errors.isEmpty()) {
+    return res
+      .status(400)
+      .json({ success: false, errors: errors.array() });
+  }
+  try {
+    const message = await PatientService.deletePatient(req.params.id);
+    return res
+      .status(200)
+      .json({ success: true, message }); // message will be "Patient deleted successfully"
+  } catch (error) {
+    return res
+      .status(400)
+      .json({ success: false, message: error.message });
+  }
 }
 
 module.exports.searchPatients = async (req, res) => {

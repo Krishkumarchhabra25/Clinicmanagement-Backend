@@ -53,7 +53,7 @@ module.exports.adminLogin = async ({ identifier, password }) => {
 
         return { success: true, token, admin };
     } catch (error) {
-        throw new Error(`Error during admin login: ${error.message}`);
+        throw new Error(`${error.message}`);
     }
 };
 
@@ -84,6 +84,6 @@ module.exports.changeAdminPassword = async ({ adminId, currentPassword, newPassw
 
         return { success: true, message: "Password changed successfully" };
     } catch (error) {
-        throw new Error(`Error changing password: ${error.message}`);
+        throw new Error(` ${error.message}`);
     }
 };
