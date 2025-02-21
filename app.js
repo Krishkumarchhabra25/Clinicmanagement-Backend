@@ -9,6 +9,8 @@ const AdminuserRoutes = require("./routes/adminUser.routes");
 const OtpRoutes = require("./routes/otp.routes");
 const PatientRoutes = require("./routes/patients.routes");
 const AvailabilityRoutes = require("./routes/availability.routes")
+const supportUserRoutes = require("./routes/support.routes")
+const ClinicRoutes = require("./routes/clinic.routes")
 const app = express();
 
 // Connect to Database
@@ -39,8 +41,11 @@ app.get("/", (req, res) => {
 
 // Routes
 app.use("/admin", AdminuserRoutes);
+app.use("/support" , supportUserRoutes)
 app.use("/otp", OtpRoutes);
 app.use("/patient", PatientRoutes);
+app.use("/clinic" , ClinicRoutes)
+
 app.use("/availability" , AvailabilityRoutes)
 
 module.exports = app;

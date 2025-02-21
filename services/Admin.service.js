@@ -1,32 +1,51 @@
 const AdminUserModel = require("../models/admin.user.model");
 
 
-module.exports.createAdminUser = async({username , email, password})=>{
-   if(!username || !email || !password){
-      throw new Error("Username , email , password are required")
-   }
-
-   try {
-      const exitingAdminUser = await AdminUserModel.findOne();
-      if(exitingAdminUser){
-        throw new Error("Admin already exist! . Only one Admin is allowed.")
+exports.createAdminUser = async ({ username, email, password }) => {
+    if (!username || !email || !password) {
+        throw new Error("All fields are required");
     }
-     const hashPassword = await AdminUserModel.hashPassword(password);
 
-     const adminUser = await AdminUserModel.create({
+    // Check if admin already exists
+    const existingAdmin = await AdminUserModel.findOne({ role: 'admin' });
+    if (existingAdmin) {
+        throw new Error("Admin already exists! Only one admin allowed.");
+    }
+
+    const hashedPassword = await AdminUserModel.hashPassword(password);
+    
+    return await AdminUserModel.create({
         username,
         email,
-        password:hashPassword
-     });
-     const token = adminUser.GenerateAuthToken();
+        password: hashedPassword,
+        role: 'admin' // Explicitly set admin role
+    });
+};
 
-     return { adminUser, token }; 
+module.exports.getAdminProfile = async (adminId) => {
+    try {
+        const admin = await AdminUserModel.findById(adminId)
+            .select('-password') // Exclude password field
+            .lean();
 
-   } catch (error) {
-     throw new Error(`Error creating admin user: ${error.message}`);
-   }
-}
+        if (!admin) {
+            throw new Error("Admin not found");
+        }
 
+        // Ensure permissions are populated for admin role
+        if (admin.role === 'admin') {
+            admin.permissions = {
+                patients: { view: true, create: true, edit: true, delete: true },
+                appointments: { create: true, edit: true },
+                availability: { edit: true }
+            };
+        }
+
+        return admin;
+    } catch (error) {
+        throw new Error(`Failed to fetch admin profile: ${error.message}`);
+    }
+};
 
 module.exports.adminLogin = async ({ identifier, password }) => {
     if (!identifier || !password) {
@@ -42,6 +61,14 @@ module.exports.adminLogin = async ({ identifier, password }) => {
             throw new Error("Invalid credentials");
         }
 
+        if (admin.role === 'admin') {
+            admin.permissions = {
+                patients: { view: true, create: true, edit: true, delete: true },
+                appointments: { create: true, edit: true },
+                availability: { edit: true }
+            };
+        }
+        
         // Use the instance method instead of calling on the model
         const isMatch = await admin.comparePassword(password);
 
@@ -56,6 +83,24 @@ module.exports.adminLogin = async ({ identifier, password }) => {
         throw new Error(`${error.message}`);
     }
 };
+
+
+module.exports.updateAdminPersonalInfo = async (adminId, personalInfoData) => {
+
+    const admin = await AdminUserModel.findById(adminId);
+    if (!admin || admin.role !== 'admin') {
+      throw new Error("Admin not found");
+    }
+  
+
+    admin.personalInfo = {
+      ...((admin.personalInfo && admin.personalInfo.toObject()) || {}), 
+      ...personalInfoData
+    };
+  
+    await admin.save();
+    return admin;
+  };
 
 
 module.exports.changeAdminPassword = async ({ adminId, currentPassword, newPassword }) => {
@@ -87,3 +132,4 @@ module.exports.changeAdminPassword = async ({ adminId, currentPassword, newPassw
         throw new Error(` ${error.message}`);
     }
 };
+
