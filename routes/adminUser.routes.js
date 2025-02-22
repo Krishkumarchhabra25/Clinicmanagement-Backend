@@ -53,5 +53,16 @@ router.put(
     adminUserController.getAdminProfile
 );
 
+router.put(
+    "/update-support-permissions",
+    authMiddleWare.adminAuthUser,
+    [
+      
+      body("permissions").exists().withMessage("Permissions object is required"),
+ 
+    ],
+    adminUserController.updateSupportPermissions
+  );
+
 
 module.exports = router

@@ -133,3 +133,59 @@ module.exports.changeAdminPassword = async ({ adminId, currentPassword, newPassw
     }
 };
 
+
+module.exports.updateSupportPermissionsService = async (permissionsData) => {
+    if (!permissionsData) {
+      console.error("❌ Error: Permissions data is required");
+      throw new Error("Permissions data is required");
+    }
+  
+    console.log("🔍 Received permissions update request:", JSON.stringify(permissionsData, null, 2));
+  
+    // Find the support user
+    const supportUser = await AdminUserModel.findOne({ role: 'support' });
+    if (!supportUser) {
+      console.error("❌ Error: Support user not found");
+      throw new Error("Support user not found");
+    }
+  
+    console.log("✅ Found support user:", supportUser.email);
+  
+    // Function to safely update permissions while keeping the correct structure
+    const updatePermissions = (existingPermissions, newPermissions) => {
+      Object.keys(newPermissions).forEach((key) => {
+        if (Object.prototype.hasOwnProperty.call(existingPermissions, key)) {
+          existingPermissions[key] = newPermissions[key]; // Update existing keys
+        } else {
+          console.warn(`⚠️ Skipping unknown permission key: ${key}`);
+        }
+      });
+    };
+  
+    // Update patients permissions if provided
+    if (permissionsData.patients) {
+      console.log("🔄 Updating patients permissions...");
+      updatePermissions(supportUser.permissions.patients, permissionsData.patients);
+    }
+  
+    // Update appointments permissions if provided
+    if (permissionsData.appointments) {
+      console.log("🔄 Updating appointments permissions...");
+      updatePermissions(supportUser.permissions.appointments, permissionsData.appointments);
+    }
+  
+    // Update availability permissions if provided
+    if (permissionsData.availability) {
+      console.log("🔄 Updating availability permissions...");
+      updatePermissions(supportUser.permissions.availability, permissionsData.availability);
+    }
+  
+    // Log final permissions before saving
+    console.log("✅ Updated permissions before saving:", JSON.stringify(supportUser.permissions, null, 2));
+  
+    await supportUser.save();
+    console.log("✅ Support user permissions saved successfully!");
+  
+    return supportUser;
+  };
+  

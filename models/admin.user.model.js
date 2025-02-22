@@ -47,7 +47,7 @@ const AdminUserSchema = new mongoose.Schema({
         dateOfBirth: { type: Date, required: false },
         gender: { type: String, enum: ["Male", "Female", "Other"], required: false },
         age:{ type:String,
-            required:true,}
+            required:false,}
     }
 });
 

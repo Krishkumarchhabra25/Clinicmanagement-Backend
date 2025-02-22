@@ -1,6 +1,7 @@
 const { validationResult } = require("express-validator")
 const adminUserService = require("../services/Admin.service")
 
+
 module.exports.registerAdmin = async (req, res) => {
   const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -122,4 +123,33 @@ module.exports.changePassword = async (req, res) => {
     } catch (error) {
         return res.status(400).json({ success: false, message: error.message });
     }
+};
+
+module.exports.updateSupportPermissions = async (req, res) => {
+  try {
+    const { permissions } = req.body;
+
+    if (!permissions) {
+      console.error("❌ Error: Permissions object is missing in request");
+      return res.status(400).json({ success: false, message: "Permissions object is required" });
+    }
+
+    console.log("🔍 Updating support permissions with:", JSON.stringify(permissions, null, 2));
+
+    const updatedSupportUser = await adminUserService.updateSupportPermissionsService(permissions);
+
+    console.log("✅ Final updated permissions:", JSON.stringify(updatedSupportUser.permissions, null, 2));
+
+    res.status(200).json({
+      success: true,
+      message: "Support permissions updated successfully",
+      data: updatedSupportUser.permissions
+    });
+  } catch (error) {
+    console.error("❌ Error updating permissions:", error.message);
+    res.status(400).json({
+      success: false,
+      message: error.message
+    });
+  }
 };

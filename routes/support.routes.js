@@ -34,4 +34,6 @@ router.delete("/delete-support",
     supportController.deleteSupportUser
 );
 
+router.get("/support/profile", supportController.getSupportProfile);
+
 module.exports = router;
