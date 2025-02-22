@@ -7,25 +7,22 @@ cloudinary.config({
   api_secret: process.env.CLOUDINARY_API_SECRET
 });
 
-// Use MemoryStorage to keep the file in memory
 const storage = multer.memoryStorage();
-const upload = multer({ storage });
 
-// Function to upload file buffer directly to Cloudinary
-async function ImageUploadUtil(file) {
-  try {
-    const result = await new Promise((resolve, reject) => {
-      cloudinary.uploader.upload_stream({ resource_type: 'auto' }, (error, result) => {
-        if (error) return reject(error);
-        resolve(result);
-      }).end(file.buffer); // Pass buffer directly
-    });
-
-    return result.secure_url; // Return Cloudinary URL
-  } catch (error) {
-    console.error("Cloudinary upload error:", error);
-    throw error;
-  }
+async function ImageUploadUtil(buffer, mimetype) {
+    try {
+        const base64String = buffer.toString('base64');
+        const dataUri = `data:${mimetype};base64,${base64String}`;
+        const result = await cloudinary.uploader.upload(dataUri, {
+            resource_type: 'auto'
+        });
+        return result;
+    } catch (error) {
+        console.error("Cloudinary upload error:", error);
+        throw error;
+    }
 }
+
+const upload = multer({ storage }).single('my_file');
 
 module.exports = { upload, ImageUploadUtil };

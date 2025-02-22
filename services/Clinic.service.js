@@ -1,5 +1,4 @@
-const clinicProfileModel = require("../models/clinicAddress.model");
-const {ImageUploadUtil} = require("../middlewares/multer")
+/* const clinicProfileModel = require("../models/clinicAddress.model");
 
 
 
@@ -65,4 +64,4 @@ const {ImageUploadUtil} = require("../middlewares/multer")
         throw new Error(`Failed to fetch profile: ${error.message}`);
       }
     }
-  
+   */
