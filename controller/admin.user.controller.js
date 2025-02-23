@@ -130,15 +130,12 @@ module.exports.updateSupportPermissions = async (req, res) => {
     const { permissions } = req.body;
 
     if (!permissions) {
-      console.error("❌ Error: Permissions object is missing in request");
       return res.status(400).json({ success: false, message: "Permissions object is required" });
     }
 
-    console.log("🔍 Updating support permissions with:", JSON.stringify(permissions, null, 2));
 
     const updatedSupportUser = await adminUserService.updateSupportPermissionsService(permissions);
 
-    console.log("✅ Final updated permissions:", JSON.stringify(updatedSupportUser.permissions, null, 2));
 
     res.status(200).json({
       success: true,
@@ -146,7 +143,6 @@ module.exports.updateSupportPermissions = async (req, res) => {
       data: updatedSupportUser.permissions
     });
   } catch (error) {
-    console.error("❌ Error updating permissions:", error.message);
     res.status(400).json({
       success: false,
       message: error.message

@@ -66,7 +66,7 @@ module.exports.getSupportProfile = async (req, res) => {
     try {
         // Fetch the support user
         const supportUser = await AdminUserModel.findOne({ role: 'support' })
-            .select("username email password permissions")
+            .select("username email password permissions role") // Include role
             .lean();
 
         if (!supportUser) {
