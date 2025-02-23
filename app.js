@@ -16,13 +16,23 @@ const app = express();
 // Connect to Database
 connectToDb();
 
-// Configure CORS Properly
+const allowedOrigins = [
+  process.env.FRONTEND_URL, 
+  process.env.PRODUCTION_FRONTEND_URL
+];
+
 app.use(
   cors({
-    origin: "*", // Frontend URL
-    credentials: true, // Allow cookies
-    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"], // Allowed methods
-    allowedHeaders: ["Content-Type", "Authorization"], // Allowed headers
+    origin: function (origin, callback) {
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error("Not allowed by CORS"));
+      }
+    },
+    credentials: true,
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"],
   })
 );
 
