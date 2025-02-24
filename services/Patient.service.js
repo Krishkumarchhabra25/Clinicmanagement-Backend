@@ -42,20 +42,25 @@ module.exports.addPatient = async ({ patientname, phonenumber, gender, age ,vill
       throw new Error(error.message);
   }
 };
+module.exports.getAllPatients = async (page = 1, limit = 10) => {
+  try {
+    // Retrieve patients for the current page
+    const patients = await PatientModel.find()
+      .skip((page - 1) * limit)
+      .limit(limit);
 
-module.exports.getAllPatients = async(page=1 , limit=10)=>{
-    try {
-      const patients = await PatientModel.find()
-             .skip((page-1) *limit)
-             .limit(limit);
+    // Count the total number of patients
+    const totalPatient = await PatientModel.countDocuments();
 
-      const totalPatient = await PatientModel.countDocuments();
-
-      return {patients , totalPages:Math.ceil(totalPatient/limit) , currentPage:page}
-    } catch (error) {
-      throw new Error(error.message)
-    }
-}
+    return {
+      patients,
+      totalPages: Math.ceil(totalPatient / limit),
+      currentPage: page,
+    };
+  } catch (error) {
+    throw new Error(error.message);
+  }
+};
 
 module.exports.GetPatientDetailsById= async(patientId)=>{
   try {
