@@ -125,6 +125,57 @@ module.exports.changePassword = async (req, res) => {
     }
 };
 
+module.exports.changePasswordAfterLogin = async (req, res) => {
+  // Validate input
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+      return res.status(400).json({ success: false, message: errors.array()[0].msg });
+  }
+
+  const { currentPassword, newPassword } = req.body;
+  if (!currentPassword || !newPassword) {
+      return res.status(400).json({ success: false, message: "Both current and new passwords are required" });
+  }
+
+  try {
+      const result = await adminUserService.changeAdminPasswordAfterLogin({
+          adminId: req.user._id,
+          currentPassword,
+          newPassword,
+      });
+
+      return res.status(200).json(result);
+  } catch (error) {
+      return res.status(400).json({ success: false, message: error.message });
+  }
+};
+
+module.exports.changePasswordBeforeLogin = async (req, res) => {
+  // Validate input
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+      return res.status(400).json({ success: false, message: errors.array()[0].msg });
+  }
+
+  const { email, lastPassword, newPassword } = req.body;
+  if (!email || !lastPassword || !newPassword) {
+      return res.status(400).json({ success: false, message: "Email, last password, and new password are required" });
+  }
+
+  try {
+      const result = await adminUserService.changeAdminPasswordBeforeLogin({
+          email,
+          lastPassword,
+          newPassword,
+      });
+
+      return res.status(200).json(result);
+  } catch (error) {
+      return res.status(400).json({ success: false, message: error.message });
+  }
+};
+
+
 module.exports.updateSupportPermissions = async (req, res) => {
   try {
     const { permissions } = req.body;

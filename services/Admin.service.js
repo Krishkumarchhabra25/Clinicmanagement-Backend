@@ -1,5 +1,5 @@
 const AdminUserModel = require("../models/admin.user.model");
-
+const bcrypt = require("bcryptjs") 
 
 exports.createAdminUser = async ({ username, email, password }) => {
     if (!username || !email || !password) {
@@ -133,6 +133,74 @@ module.exports.changeAdminPassword = async ({ adminId, currentPassword, newPassw
     }
 };
 
+module.exports.changeAdminPasswordAfterLogin = async ({ adminId, currentPassword, newPassword }) => {
+    if (!adminId || !currentPassword || !newPassword) {
+        throw new Error("Current password and new password are required");
+    }
+
+    try {
+        // Get the admin user
+        const adminUser = await AdminUserModel.findById(adminId).select("+password");
+        if (!adminUser) {
+            throw new Error("Admin user not found");
+        }
+
+        // Compare provided current password with stored password
+        const isMatch = await bcrypt.compare(currentPassword, adminUser.password);
+        if (!isMatch) {
+            throw new Error("Current password is incorrect");
+        }
+
+        // Hash new password
+        const hashedPassword = await bcrypt.hash(newPassword, 10);
+
+        // Update admin user's password
+        adminUser.password = hashedPassword;
+        await adminUser.save();
+
+        return { success: true, message: "Password changed successfully" };
+    } catch (error) {
+        throw new Error(error.message);
+    }
+};
+
+
+module.exports.changeAdminPasswordBeforeLogin = async ({ email, lastPassword, newPassword }) => {
+    if (!email || !lastPassword || !newPassword) {
+        throw new Error("Email, last password, and new password are required");
+    }
+
+    try {
+        // Find the admin user by email and explicitly select the password field
+        const adminUser = await AdminUserModel.findOne({ email }).select("+password");
+
+        if (!adminUser) {
+            throw new Error("Admin user not found");
+        }
+
+        // Check if the password exists
+        if (!adminUser.password) {
+            throw new Error("Password is missing for this admin user. Please reset it.");
+        }
+
+        // Use the model's comparePassword method
+        const isMatch = await adminUser.comparePassword(lastPassword);
+        if (!isMatch) {
+            throw new Error("Last password is incorrect");
+        }
+
+        // Use the model's hashPassword method to hash the new password
+        const hashedPassword = await AdminUserModel.hashPassword(newPassword);
+
+        // Update the user's password
+        adminUser.password = hashedPassword;
+        await adminUser.save();
+
+        return { success: true, message: "Password changed successfully. You can now log in." };
+    } catch (error) {
+        throw new Error(error.message);
+    }
+};
 
 module.exports.updateSupportPermissionsService = async (permissionsData) => {
     if (!permissionsData) {
