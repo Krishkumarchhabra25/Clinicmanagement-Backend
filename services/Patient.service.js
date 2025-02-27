@@ -241,3 +241,37 @@ module.exports.exportPatients = async () => {
     throw new Error(error.message);
   }
 };
+
+module.exports.getDashboardStats = async () => {
+  // Get total number of patients
+  const totalPatients = await PatientModel.countDocuments();
+
+  // Calculate today's patients by filtering on the createdAt timestamp.
+  const startOfDay = new Date();
+  startOfDay.setHours(0, 0, 0, 0);
+  const endOfDay = new Date();
+  endOfDay.setHours(23, 59, 59, 999);
+
+  const todaysPatients = await PatientModel.countDocuments({
+    createdAt: { $gte: startOfDay, $lte: endOfDay },
+  });
+
+  // Aggregate the count of patients grouped by gender
+  const genderCounts = await PatientModel.aggregate([
+    {
+      $group: {
+        _id: "$gender",
+        count: { $sum: 1 },
+      },
+    },
+  ]);
+
+  // Calculate percentages for each gender
+  const genderPercentages = { male: 0, female: 0, other: 0 };
+  genderCounts.forEach((item) => {
+    const percentage = totalPatients ? (item.count / totalPatients) * 100 : 0;
+    genderPercentages[item._id] = Number(percentage.toFixed(2));
+  });
+
+  return { totalPatients, todaysPatients, genderPercentages };
+};

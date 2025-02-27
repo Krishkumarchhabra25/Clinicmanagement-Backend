@@ -14,7 +14,7 @@ const ClinicRoutes = require("./routes/clinic.routes");
 
 const app = express();
 
-// Connect to Database
+
 connectToDb();
 
 const allowedOrigins = [

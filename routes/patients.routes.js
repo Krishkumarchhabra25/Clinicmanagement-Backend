@@ -51,4 +51,7 @@ router.get("/sort-patient", authMiddleWare.adminAuthUser, PatientController.sort
 
 router.get("/export-patient", authMiddleWare.adminAuthUser, PatientController.exportPatients);
 
+router.get("/stats", authMiddleWare.adminAuthUser, PatientController.getDashboardStats);
+
+
 module.exports = router;
