@@ -11,17 +11,20 @@ const storage = multer.memoryStorage();
 
 async function ImageUploadUtil(buffer, mimetype) {
     try {
-        const base64String = buffer.toString('base64');
-        const dataUri = `data:${mimetype};base64,${base64String}`;
-        const result = await cloudinary.uploader.upload(dataUri, {
-            resource_type: 'auto'
-        });
+        const result = await cloudinary.uploader.upload_stream(
+            { resource_type: 'image' },
+            (error, result) => {
+                if (error) throw error;
+                return result;
+            }
+        ).end(buffer);
         return result;
     } catch (error) {
         console.error("Cloudinary upload error:", error);
         throw error;
     }
 }
+
 
 const upload = multer({ storage }).single('my_file');
 
