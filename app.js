@@ -14,22 +14,27 @@ const ClinicRoutes = require("./routes/clinic.routes");
 
 const app = express();
 
-
+// Connect to Database
 connectToDb();
 
+// Allowed Origins List
 const allowedOrigins = [
-  process.env.FRONTEND_URL || "http://localhost:5173",
-  process.env.PRODUCTION_FRONTEND_URL || "https://krishdev-clinic.netlify.app",
+  "http://localhost:5173",
+  "https://krishdev-clinic.netlify.app",
 ];
 
-console.log("Allowed Origins:", allowedOrigins);
+// Enable Netlify Subdomains
+const isAllowedOrigin = (origin) => {
+  return !origin || allowedOrigins.includes(origin) || /\.netlify\.app$/.test(origin);
+};
 
+// CORS Middleware
 app.use(
   cors({
     origin: function (origin, callback) {
       console.log("Incoming Origin:", origin);
-      if (!origin || allowedOrigins.includes(origin)) {
-        callback(null, origin);
+      if (isAllowedOrigin(origin)) {
+        callback(null, true);
       } else {
         console.error("Blocked by CORS:", origin);
         callback(new Error("Not allowed by CORS"));
@@ -41,6 +46,9 @@ app.use(
   })
 );
 
+// Handle Preflight Requests
+app.options("*", cors());
+
 // Middleware
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -51,11 +59,6 @@ app.get("/", (req, res) => {
   res.send("Hello World");
 });
 
-const PORT = process.env.PORT || 5000
-
-app.listen(PORT, () => {
-  console.log(`Server running on http://localhost:${PORT}`);
-});
 // Routes
 app.use("/admin", AdminuserRoutes);
 app.use("/support", supportUserRoutes);
@@ -63,5 +66,11 @@ app.use("/otp", OtpRoutes);
 app.use("/patient", PatientRoutes);
 app.use("/clinic", ClinicRoutes);
 app.use("/availability", AvailabilityRoutes);
+
+// Start Server
+const PORT = process.env.PORT || 5000;
+app.listen(PORT, () => {
+  console.log(`Server running on http://localhost:${PORT}`);
+});
 
 module.exports = app;
