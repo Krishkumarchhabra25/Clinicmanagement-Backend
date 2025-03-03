@@ -9,7 +9,9 @@ router.post('/upload-image', upload, clinicController.handleImageUpload , checkR
 
 // Basic Info Routes
 /* router.post('/add-basic-info', upload, clinicController.addBasicInfo , checkRole(['admin']) , adminAuthUser) ; */
-router.put('/update-basic-info', upload, clinicController.updateBasicInfo , checkRole(['admin']) , adminAuthUser);
+router.put('/update-basic-info',
+  clinicController.updateBasicInfo,
+   checkRole(['admin']) , adminAuthUser);
 
 // Address Routes
 /* router.post('/add-address', clinicController.addAddress , checkRole(['admin']) , adminAuthUser); */
