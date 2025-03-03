@@ -12,8 +12,7 @@ const ClinicBasicInfoSchema = new mongoose.Schema(
       trim: true,
     },
     logo: {
-      public_id: String,
-      url: String,
+      type:String
     },
   },
   { timestamps: true }
