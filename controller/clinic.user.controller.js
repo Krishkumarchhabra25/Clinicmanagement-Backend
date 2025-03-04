@@ -50,7 +50,7 @@ module.exports.updateBasicInfo = async (req, res) => {
         await deleteImage(oldPublicId);
       }
 
-      clinicInfo.logo = newImage;
+      clinicInfo.logo = newImage.url;
     }
 
     clinicInfo.clinicName = clinicName;
