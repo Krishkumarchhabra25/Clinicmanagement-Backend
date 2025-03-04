@@ -32,8 +32,7 @@ module.exports.handleImageUpload = async (req, res) => {
 // ----------------- UNIVERSAL UPDATE/CREATE BASIC INFO -----------------
 module.exports.updateBasicInfo = async (req, res) => {
   try {
-    console.log('Received req.body:', req.body);  // Log text fields
-    console.log('Received req.file:', req.file);    // Log file details
+  
 
     // Trim the clinicName to remove accidental whitespace
     const clinicName = req.body.clinicName ? req.body.clinicName.trim() : "";

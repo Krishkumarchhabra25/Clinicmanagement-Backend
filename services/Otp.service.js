@@ -25,7 +25,6 @@ module.exports.SendOtp = async (email) => {
             subject: "Your OTP Code",
             html: `<p>Your OTP is: <strong>${otp}</strong>. It is valid for 2 minutes.</p>`
         });
-        console.log("Email sent:", info);
         setTimeout(async () => {
             await OtpModel.deleteOne({ _id: otpRecord._id });
         }, 120 * 1000);

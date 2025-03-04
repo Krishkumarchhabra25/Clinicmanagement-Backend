@@ -9,7 +9,6 @@ module.exports.addPatient = async ({ patientname, phonenumber, gender, age ,vill
   }
 
   try {
-      console.log("Checking for existing patient with email:", email);
       const existingPatient = await PatientModel.findOne({ email });
 
       if (existingPatient) {
@@ -34,7 +33,6 @@ module.exports.addPatient = async ({ patientname, phonenumber, gender, age ,vill
           remarks
       });
 
-      console.log("Saving new patient:", newPatient);
 
       return await newPatient.save();
   } catch (error) {
@@ -235,7 +233,6 @@ module.exports.exportPatients = async () => {
 
     // Write the file to buffer
     const buffer = await workbook.xlsx.writeBuffer();
-    console.log("Buffer length:", buffer.length)
     return buffer;
   } catch (error) {
     throw new Error(error.message);

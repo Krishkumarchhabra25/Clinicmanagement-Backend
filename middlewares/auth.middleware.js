@@ -3,19 +3,15 @@ const AdminUserModel = require("../models/admin.user.model");
 
 module.exports.adminAuthUser = async (req, res, next) => {
   try {
-    console.log("Request headers:", req.headers);
     const token = req.cookies.token || req.headers.authorization?.replace('Bearer ', '');
-    console.log("Extracted Token:", token);
 
     if (!token) {
       return res.status(401).json({ message: "Authorization required" });
     }
 
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    console.log("Decoded Token:", decoded);
 
     const user = await AdminUserModel.findById(decoded._id).select('+role +isActive').lean();
-    console.log("Fetched User:", user);
 
     if (!user) {
       return res.status(401).json({ message: "Invalid account" });

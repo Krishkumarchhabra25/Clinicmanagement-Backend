@@ -32,11 +32,9 @@ const isAllowedOrigin = (origin) => {
 app.use(
   cors({
     origin: function (origin, callback) {
-      console.log("Incoming Origin:", origin);
       if (isAllowedOrigin(origin)) {
         callback(null, true);
       } else {
-        console.error("Blocked by CORS:", origin);
         callback(new Error("Not allowed by CORS"));
       }
     },

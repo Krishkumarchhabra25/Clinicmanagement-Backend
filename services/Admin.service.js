@@ -140,7 +140,6 @@ module.exports.changeSupportPasswordAftrLogin = async ({ email, newPassword }) =
     }
 
     try {
-        console.log("AdminUserModel:", AdminUserModel);
 
         const supportUser = await AdminUserModel.findOne({ email });
         if (!supportUser) {
@@ -267,7 +266,6 @@ module.exports.updateSupportPermissionsService = async (permissionsData) => {
     }
   
     if (permissionsData.availability) {
-      console.log("🔄 Updating availability permissions...");
       updatePermissions(supportUser.permissions.availability, permissionsData.availability);
     }
   
