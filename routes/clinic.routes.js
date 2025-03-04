@@ -10,8 +10,8 @@ const { checkRole, adminAuthUser } = require('../middlewares/auth.middleware');
 /* router.post('/add-basic-info', upload, clinicController.addBasicInfo , checkRole(['admin']) , adminAuthUser) ; */
 router.put('/update-basic-info',
   upload.single('logo'),
-  checkRole(['admin']),
   adminAuthUser,
+  checkRole(['admin']),
   clinicController.updateBasicInfo
 );
 // Address Routes

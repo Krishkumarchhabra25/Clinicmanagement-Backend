@@ -2,9 +2,9 @@ const jwt = require("jsonwebtoken")
 const AdminUserModel = require("../models/admin.user.model");
 
 module.exports.adminAuthUser = async (req, res, next) => {
+  console.log('callled...................')
   try {
     const token = req.cookies.token || req.headers.authorization?.replace('Bearer ', '');
-
     if (!token) {
       return res.status(401).json({ message: "Authorization required" });
     }
@@ -39,7 +39,7 @@ module.exports.adminAuthUser = async (req, res, next) => {
 
 exports.checkRole = (allowedRoles = []) => {
   return (req, res, next) => {
-      console.log('req.user',req)
+    console.log('user',req.user)
         if (!allowedRoles.includes(req.user?.role)) {
             return res.status(403).json({ message: "Access denied" });
         }
