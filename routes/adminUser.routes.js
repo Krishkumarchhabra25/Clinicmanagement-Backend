@@ -58,6 +58,16 @@ router.post(
   adminUserController.changePasswordAfterLogin
 );
 
+router.post(
+  "/change-support-password",
+  authMiddleWare.adminAuthUser,
+  [
+      body("email").isEmail().withMessage("Valid email is required"),
+      body("newPassword").isLength({ min: 6 }).withMessage("New password must be at least 6 characters long"),
+  ],
+  adminUserController.changeSupportPasswordAfterLogin
+);
+
 // Update Personal Info
 router.put(
   "/personal-info",
@@ -88,3 +98,4 @@ router.put(
 );
 
 module.exports = router;
+  

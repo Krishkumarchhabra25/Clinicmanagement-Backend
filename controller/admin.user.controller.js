@@ -149,6 +149,29 @@ module.exports.changePasswordAfterLogin = async (req, res) => {
       return res.status(400).json({ success: false, message: error.message });
   }
 };
+module.exports.changeSupportPasswordAfterLogin = async (req, res) => {
+  // Validate input
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+      return res.status(400).json({ success: false, message: errors.array()[0].msg });
+  }
+
+  const { email, newPassword } = req.body;
+  if (!email || !newPassword) {
+      return res.status(400).json({ success: false, message: "Email and new password are required" });
+  }
+
+  try {
+      const result = await adminUserService.changeSupportPasswordAftrLogin({
+          email,
+          newPassword,
+      });
+
+      return res.status(200).json(result);
+  } catch (error) {
+      return res.status(400).json({ success: false, message: error.message });
+  }
+};
 
 module.exports.changePasswordBeforeLogin = async (req, res) => {
   // Validate input

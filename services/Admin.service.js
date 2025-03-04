@@ -132,6 +132,36 @@ module.exports.changeAdminPassword = async ({ adminId, currentPassword, newPassw
         throw new Error(` ${error.message}`);
     }
 };
+module.exports.changeSupportPasswordAftrLogin = async ({ email, newPassword }) => {
+    if (!email || !newPassword) {
+        throw new Error("Email and new password are required");
+    }
+
+    try {
+        // Step 1: Find the support user by email in the SupportUserModel
+        const supportUser = await SupportUserModel.findOne({ email });
+        if (!supportUser) {
+            throw new Error("Support user not found");
+        }
+
+        // Step 2: Find the corresponding admin user in the AdminUserModel
+        const adminUser = await AdminUserModel.findOne({ email });
+        if (!adminUser) {
+            throw new Error("Admin user not found for this support user");
+        }
+
+        // Step 3: Hash the new password
+        const hashedPassword = await bcrypt.hash(newPassword, 10);
+
+        // Step 4: Update the password in the AdminUserModel
+        adminUser.password = hashedPassword;
+        await adminUser.save();
+
+        return { success: true, message: "Support password changed successfully" };
+    } catch (error) {
+        throw new Error(error.message);
+    }
+};
 
 module.exports.changeAdminPasswordAfterLogin = async ({ adminId, currentPassword, newPassword }) => {
     if (!adminId || !currentPassword || !newPassword) {
