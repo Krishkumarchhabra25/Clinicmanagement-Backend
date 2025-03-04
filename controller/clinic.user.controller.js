@@ -1,6 +1,7 @@
 const ClinicBasicInfo = require('../models/clinicBasicInfo.model');
 const ClinicAddress = require('../models/clinicAddress.model');
 const { ImageUploadUtil } = require('../middlewares/multer');
+const { uploadImage, deleteImage } = require('../utils/ImageUtils');
 
 module.exports.handleImageUpload = async (req, res) => {
   try {
@@ -31,78 +32,48 @@ module.exports.handleImageUpload = async (req, res) => {
 // ----------------- UNIVERSAL UPDATE/CREATE BASIC INFO -----------------
 module.exports.updateBasicInfo = async (req, res) => {
   try {
-    const { clinicName, tagline } = req.body;
+    console.log('Received req.body:', req.body);  // Log text fields
+    console.log('Received req.file:', req.file);    // Log file details
+
+    // Trim the clinicName to remove accidental whitespace
+    const clinicName = req.body.clinicName ? req.body.clinicName.trim() : "";
+    const { tagline } = req.body;
+
     
-    // Validate required field
-    if (!clinicName) {
-      return res.status(400).json({ 
-        success: false, 
-        message: "Clinic name is required" 
-      });
-    }
+    let clinicInfo = await ClinicBasicInfo.findOne() || new ClinicBasicInfo({});
+    const oldPublicId = clinicInfo.logo?.public_id;
 
-    // Find or create clinic info
-    let basicInfo = await ClinicBasicInfo.findOne() || new ClinicBasicInfo({});
-    let logoData = basicInfo.logo ? { ...basicInfo.logo } : null;
-
-    // Process new image if uploaded
     if (req.file) {
-      try {
-        // Upload to Cloudinary
-        const result = await ImageUploadUtil(
-          req.file.buffer, 
-          req.file.mimetype
-        );
-
-        // Delete old image if exists
-        if (basicInfo.logo?.public_id) {
-          await cloudinary.uploader.destroy(basicInfo.logo.public_id);
-        }
-
-        logoData = {
-          public_id: result.public_id,
-          url: result.secure_url
-        };
-      } catch (uploadError) {
-        console.error("Image upload failed:", uploadError);
-        return res.status(500).json({
-          success: false,
-          message: "Image upload failed",
-          error: uploadError.message
-        });
+      const { buffer, mimetype } = req.file;
+      const newImage = await uploadImage(buffer, mimetype);
+      
+      if (oldPublicId) {
+        await deleteImage(oldPublicId);
       }
+
+      clinicInfo.logo = newImage;
     }
 
-    // Prepare update data
-    const updateData = {
-      clinicName,
-      tagline: tagline || basicInfo.tagline || "",
-      logo: logoData
-    };
+    clinicInfo.clinicName = clinicName;
+    clinicInfo.tagline = tagline || clinicInfo.tagline;
 
-    // Update database
-    const options = { new: true, upsert: true };
-    const updatedInfo = await ClinicBasicInfo.findByIdAndUpdate(
-      basicInfo._id,
-      updateData,
-      options
-    );
+    const savedInfo = await clinicInfo.save();
 
-    return res.status(200).json({
+    return res.json({
       success: true,
-      message: "Clinic info updated",
-      data: updatedInfo
+      message: "Clinic info updated successfully",
+      data: savedInfo
     });
 
   } catch (error) {
     console.error("Update error:", error);
     return res.status(500).json({
       success: false,
-      message: "Server error",
-      error: error.message
+      message: error.message || "Server error"
     });
   }
 };
+
 
 /* // ----------------- ADD BASIC INFO -----------------
 exports.addBasicInfo = async (req, res) => {

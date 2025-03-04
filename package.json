@@ -2,7 +2,7 @@
   "name": "clinicmanagementserver",
   "version": "1.0.0",
   "main": "app.js",
-"scripts": {
+  "scripts": {
     "start": "node app.js",
     "dev": "nodemon app.js"
   },
@@ -11,6 +11,7 @@
   "license": "ISC",
   "description": "",
   "dependencies": {
+    "bcrypt": "^5.1.1",
     "bcryptjs": "^2.4.3",
     "cloudinary": "^2.5.1",
     "cookie-parser": "^1.4.7",

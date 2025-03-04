@@ -150,6 +150,7 @@ module.exports.changePasswordAfterLogin = async (req, res) => {
   }
 };
 module.exports.changeSupportPasswordAfterLogin = async (req, res) => {
+
   // Validate input
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
@@ -160,7 +161,8 @@ module.exports.changeSupportPasswordAfterLogin = async (req, res) => {
   if (!email || !newPassword) {
       return res.status(400).json({ success: false, message: "Email and new password are required" });
   }
-
+  console.log("req" , req);
+  console.log("response..." ,res)
   try {
       const result = await adminUserService.changeSupportPasswordAftrLogin({
           email,
@@ -169,7 +171,9 @@ module.exports.changeSupportPasswordAfterLogin = async (req, res) => {
 
       return res.status(200).json(result);
   } catch (error) {
+    console.log("errors" , error)
       return res.status(400).json({ success: false, message: error.message });
+
   }
 };
 

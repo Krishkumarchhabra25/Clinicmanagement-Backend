@@ -4,7 +4,6 @@ const ClinicBasicInfoSchema = new mongoose.Schema(
   {
     clinicName: {
       type: String,
-      required: [true, 'Clinic name is required'],
       trim: true,
     },
     tagline: {

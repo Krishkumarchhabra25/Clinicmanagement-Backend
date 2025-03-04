@@ -1,39 +1,42 @@
-const mongoose = require("mongoose")
+const mongoose = require("mongoose");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 
 const SupportUserSchema = new mongoose.Schema({
-    username:{
-        type:String,
-        required:true,
-        unique:true,
-        minlength:[10 , "username must be unique"]
+    username: {
+        type: String,
+        required: true,
+        unique: true,
+        minlength: [10, "username must be unique"]
     },
-    email:{
-        type:String,
-        required:true,
-        unique:true,
-        minlength:[5,"Email must be at least 3 characters long"]
+    email: {
+        type: String,
+        required: true,
+        unique: true,
+        minlength: [5, "Email must be at least 3 characters long"]
     },
-    password:{
-        type:String,
-        required:true,
-        select:false
+    password: {
+        type: String,
+        required: true,
+        select: false
     }
 });
-SupportUserSchema.generateAuthToken = function () {
-    const token = jwt.sign({_id:this._id}, process.env.JWT_SECRET,{expiresIn:'24h'});
-    return token;
-}
 
-SupportUserSchema.comparePassword = async function (password){
-     return  await bcrypt.compare(password , this.password)
-}
+// Instance method for generating auth token
+SupportUserSchema.methods.generateAuthToken = function () {
+    return jwt.sign({ _id: this._id }, process.env.JWT_SECRET, { expiresIn: '24h' });
+};
 
-SupportUserSchema.hashPassword = async function (password){
-    return bcrypt.hash(password , 10)
-}
+// Instance method for comparing passwords
+SupportUserSchema.methods.comparePassword = async function (password) {
+    return await bcrypt.compare(password, this.password);
+};
 
-const SupportUserModel  = mongoose.model("user" , SupportUserSchema);
+// Static method for hashing passwords
+SupportUserSchema.statics.hashPassword = async function (password) {
+    return await bcrypt.hash(password, 10);
+};
 
-module.exports = SupportUserModel
+// Prevent model overwriting
+const SupportUserModel = mongoose.model("support", SupportUserSchema);
+module.exports = SupportUserModel;
